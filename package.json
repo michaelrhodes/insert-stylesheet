@@ -6,13 +6,15 @@
   "dependencies": {},
   "devDependencies": {
     "computed-style": "^0.1.3",
-    "tape": "^2.13.1"
+    "http-server": "^0.7.1",
+    "tape": "^3.0.0"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/michaelrhodes/insert-stylesheet.git"
   },
   "testling": {
+    "server": "http-server test/assets",
     "files": "test/*.js",
     "browsers": [
       "ie/6..latest",
