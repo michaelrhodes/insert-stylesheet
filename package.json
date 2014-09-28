@@ -1,6 +1,6 @@
 {
   "name": "insert-stylesheet",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Insert a stylesheet <link> into the <head>.",
   "main": "index.js",
   "dependencies": {},
