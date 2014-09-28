@@ -10,7 +10,7 @@ $ npm install insert-stylesheet
 
 ## API
 ```
-  insert(stylesheet-href, options, cb)
+  insert(stylesheet-href, [options, cb])
 ```
 
 ### Usage
@@ -19,13 +19,15 @@ var insert = require('insert-stylesheet')
 
 insert('/styles/mine.css')
 insert('http://your-site.com/stylesheet.css')
+
+// Returns the element
 var link = insert('/styles/yours.css')
 
-insert('/styles/well.css', function loaded(err, link) {
-  // err and link populated accordingly
+insert('/styles/well.css', function (err, link) {
 })
 
-insert('/styles/widget.css', { prepend: true }) // prepend style sheet to othe style sheets
+// Add stylesheet at the top of <head>
+insert('/styles/widget.css', { prepend: true }) 
 ```
 
 ### License
