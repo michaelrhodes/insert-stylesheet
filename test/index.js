@@ -1,50 +1,47 @@
 var test = require('tape')
+var computed = require('computed-style')
 var insertStylesheet = require('../')
-var resolve = require('url').resolve
+var resolve = (function(base) {
+  base = base.replace(/^(.+\/\/[^\/#\?]+).*$/, '$1')
+  return function(segment) {
+   return base + segment 
+  }
+})(location.href)
 
 test('it returns the created link `Element`', function (t) {
   t.plan(2)
 
-  var stylesheet = insertStylesheet(resolve(location.href, '/element.css'))
+  var stylesheet = insertStylesheet(resolve('/element.css'))
   t.ok(stylesheet instanceof Element, 'Link is an `Element`')
-  t.ok(document.contains(stylesheet), 'Link added to `document`')
+  t.ok(stylesheet.parentNode !== null, 'Link added to `document`')
 })
 
 test('it adds stylesheets', function (t) {
   t.plan(1)
 
-  insertStylesheet(resolve(location.href, '/green.css'))
-  .addEventListener('load', function(e) {
-    t.equal(
-      window
-        .getComputedStyle(document.body)
-        .getPropertyValue('background-color'),
-      'rgb(0, 255, 0)',
-      'Body is all green'
-    )
-  })
+  insertStylesheet(resolve('/green.css')).onload = function(e) {
+    var color = computed(document.body, 'background-color')
+    var isGreen = color === 'rgb(0, 255, 0)' || color === '#00ff00'
+    t.ok(isGreen, 'Body is all green')
+  }
 })
 
 test('it provides a callback', function (t) {
   t.plan(2)
 
-  insertStylesheet(resolve(location.href, '/blue.css'), function blueLoaded(err, link) {
+  insertStylesheet(resolve('/blue.css'), function blueLoaded(err, link) {
     t.error(err)
-    t.equal(
-      window
-        .getComputedStyle(document.body)
-        .getPropertyValue('background-color'),
-      'rgb(0, 0, 255)',
-      'Body is all blue'
-    )
+    var color = computed(document.body, 'background-color')
+    var isBlue = color === 'rgb(0, 0, 255)' || color === '#0000ff'
+    t.ok(isBlue, 'Body is all blue')
   })
 })
 
 test('it handles load errors', function (t) {
   t.plan(1)
 
-  insertStylesheet(resolve(location.href, '/404.css'), function blueLoaded(err, link) {
-    if (err === null) {
+  insertStylesheet(resolve('/404.css'), function blueLoaded(err, link) {
+    if (!err) {
       return t.fail('We should get an error')
     }
 
@@ -54,20 +51,17 @@ test('it handles load errors', function (t) {
 
 test('it supports preprend', function(t) {
   var isBlackCss = /black\.css$/
+  var head = document.getElementsByTagName('head')[0]
   t.plan(3)
 
-  t.notOk(isBlackCss.test(document.styleSheets[0].href), 'First stylesheet is not `black.css`')
+  t.notOk(isBlackCss.test(head.childNodes[0].href), 'First stylesheet is not `black.css`')
 
-  insertStylesheet(resolve(location.href, '/blue.css'), function blueLoaded() {
-    insertStylesheet(resolve(location.href, '/black.css'), { prepend: true}, function blackLoaded() {
-      t.ok(isBlackCss.test(document.styleSheets[0].href), 'First stylesheet is black.css')
-      t.equal(
-        window
-          .getComputedStyle(document.body)
-          .getPropertyValue('background-color'),
-        'rgb(0, 0, 255)',
-        'Body is still blue'
-      )
+  insertStylesheet(resolve('/blue.css'), function blueLoaded() {
+    insertStylesheet(resolve('/black.css'), { prepend: true }, function blackLoaded() {
+      t.ok(isBlackCss.test(head.childNodes[0].href), 'First stylesheet is black.css')
+      var color = computed(document.body, 'background-color')
+      var isBlue = color === 'rgb(0, 0, 255)' || color === '#0000ff'
+      t.ok(isBlue, 'Body is still blue')
     })
   })
 })

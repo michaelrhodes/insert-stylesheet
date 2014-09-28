@@ -1,33 +1,32 @@
-module.exports = function(href, opts, cb) {
-  if (opts && typeof opts === 'function') {
-    cb = opts
-    opts = {}
+module.exports = function(href, options, callback) {
+  if (options && typeof options === 'function') {
+    callback = options
+    options = {}
   }
 
-  opts = opts || {
+  options = options || {
     prepend: false
   }
 
   var head = document.getElementsByTagName('head')[0]
   var link = document.createElement('link')
+
   link.setAttribute('rel', 'stylesheet')
   link.setAttribute('href', href)
 
-  if (cb) {
-    link.addEventListener('error', function styleSheetFailed(err) {
-      cb(err, link)
-    });
+  if (callback) {
+    link.onerror = function(error) {
+      callback(error, link)
+    }
 
-    link.addEventListener('load', function styleSheetLoaded() {
-      cb(null, link)
-    });
+    link.onload = function() {
+      callback(null, link)
+    }
   }
 
-  if (opts.prepend) {
-    head.insertBefore(link, head.childNodes[0]);
-  } else {
-    head.appendChild(link);
-  }
+  options.prepend ?
+    head.insertBefore(link, head.childNodes[0]) :
+    head.appendChild(link)
 
   return link
 }
