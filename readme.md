@@ -10,7 +10,7 @@ $ npm install insert-stylesheet
 
 ## API
 ```
-  insert(stylesheet-href, [options, cb])
+  insert(stylesheet-url, [options, callback])
 ```
 
 ### Usage
@@ -23,8 +23,7 @@ insert('http://your-site.com/stylesheet.css')
 // Returns the element
 var link = insert('/styles/yours.css')
 
-insert('/styles/well.css', function (err, link) {
-})
+insert('/styles/well.css', function (err, link) {})
 
 // Add stylesheet at the top of <head>
 insert('/styles/widget.css', { prepend: true }) 
